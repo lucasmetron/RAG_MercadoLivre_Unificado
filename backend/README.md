@@ -1,0 +1,251 @@
+# RAG Mercado Livre
+
+API de perguntas e respostas usando **RAG - Retrieval-Augmented Generation** sobre uma base local de politicas inspiradas no Mercado Livre.
+
+O projeto recebe uma pergunta, busca os trechos mais relevantes em documentos Markdown, monta um prompt com contexto e envia para um modelo de linguagem via OpenRouter. A ideia e demonstrar, de forma simples e objetiva, como combinar embeddings locais, busca semantica e LLMs em uma aplicacao Node.js.
+
+## Destaques
+
+- Busca semantica com embeddings locais.
+- Pipeline de ingestao para transformar documentos `.md` em chunks vetorizados.
+- API HTTP com Express.
+- Prompt controlado para responder apenas com base no contexto recuperado.
+- Integracao com modelos de linguagem via OpenRouter.
+- Estrutura simples, boa para estudo, demonstracao tecnica e portfolio.
+
+## Como Funciona
+
+```mermaid
+flowchart LR
+  A[Documentos Markdown] --> B[Text Splitter]
+  B --> C[Chunks]
+  C --> D[Embeddings locais]
+  D --> E[(Base JSON)]
+  F[Pergunta do usuario] --> G[Embedding da pergunta]
+  G --> H[Similaridade de cosseno]
+  E --> H
+  H --> I[Contexto relevante]
+  I --> J[Prompt RAG]
+  J --> K[OpenRouter / DeepSeek]
+  K --> L[Resposta]
+```
+
+## Estrutura do Projeto
+
+```text
+RAG_MercadoLivre/
+|-- src/
+|   |-- data/                           # Documentos usados como base de conhecimento
+|   |-- db/
+|   |   `-- chunks-with-embeddings.json # Chunks processados com embeddings
+|   |-- functions/
+|   |   |-- ai.js                       # Chamada ao modelo via OpenRouter
+|   |   |-- generatePrompt.js           # Montagem do prompt com contexto
+|   |   |-- ingest.js                   # Pipeline de ingestao e embeddings
+|   |   `-- returnSimilarity.js         # Busca por similaridade semantica
+|   `-- server.js                       # API Express
+|-- .env.example
+|-- package.json
+`-- README.md
+```
+
+## Tecnologias e Bibliotecas
+
+| Biblioteca | Uso no projeto |
+| --- | --- |
+| `express` | Cria a API HTTP e o endpoint `/ask`. |
+| `dotenv` | Carrega variaveis de ambiente a partir do arquivo `.env`. |
+| `@huggingface/transformers` | Gera embeddings localmente com o modelo `Xenova/all-MiniLM-L6-v2`. |
+| `@langchain/textsplitters` | Divide os documentos em chunks menores com sobreposicao. |
+| `openai` | SDK instalado para integracoes com modelos compativeis com OpenAI. |
+| `@langchain/core` | Utilitarios base do ecossistema LangChain. |
+| `@langchain/openai` | Integracao LangChain com provedores compativeis com OpenAI. |
+
+## Pre-requisitos
+
+- Node.js 18 ou superior.
+- npm ou Yarn.
+- Uma chave de API do OpenRouter.
+
+## Configuracao
+
+Clone o repositorio e instale as dependencias:
+
+```bash
+npm install
+```
+
+Ou, se preferir Yarn:
+
+```bash
+yarn install
+```
+
+Crie um arquivo `.env` na raiz do projeto com base no `.env.example`:
+
+```env
+OPENROUTER_API_KEY=sua_chave_aqui
+OPENROUTER_MODEL=deepseek/deepseek-chat
+```
+
+> `OPENROUTER_MODEL` e opcional. Se nao for informado, o projeto usa `deepseek/deepseek-chat`.
+
+## Gerar a Base Vetorial
+
+Antes de iniciar a API, rode a ingestao dos documentos:
+
+```bash
+npm run ingest
+```
+
+Ou com Yarn:
+
+```bash
+yarn ingest
+```
+
+Esse comando:
+
+1. Le os arquivos Markdown em `src/data`.
+2. Divide os textos em chunks.
+3. Gera embeddings locais com Hugging Face Transformers.
+4. Salva o resultado em `src/db/chunks-with-embeddings.json`.
+
+Na primeira execucao, o modelo de embeddings pode ser baixado e armazenado em `.cache/huggingface`.
+
+## Iniciar o Projeto
+
+Para iniciar em modo normal:
+
+```bash
+npm start
+```
+
+Ou:
+
+```bash
+yarn start
+```
+
+Para desenvolvimento com reload automatico:
+
+```bash
+npm run dev
+```
+
+Ou:
+
+```bash
+yarn dev
+```
+
+Por padrao, a API roda em:
+
+```text
+http://localhost:3000
+```
+
+Tambem e possivel definir outra porta no `.env`:
+
+```env
+PORT=3333
+```
+
+## Como Usar a API
+
+Endpoint:
+
+```http
+POST /ask
+```
+
+Exemplo com `curl`:
+
+```bash
+curl -X POST http://localhost:3000/ask \
+  -H "Content-Type: application/json" \
+  -d "{\"question\":\"Como funciona a devolucao de um produto?\"}"
+```
+
+Exemplo de corpo da requisicao:
+
+```json
+{
+  "question": "Como funciona a devolucao de um produto?"
+}
+```
+
+Exemplo de resposta:
+
+```json
+{
+  "question": "Como funciona a devolucao de um produto?",
+  "resp": {
+    "choices": []
+  },
+  "context": "Trechos recuperados da base de conhecimento...",
+  "similarity": [
+    {
+      "id": "devolucao.md-0",
+      "source": "devolucao.md",
+      "content": "Conteudo do chunk...",
+      "score": 0.78
+    }
+  ]
+}
+```
+
+## Scripts Disponiveis
+
+| Comando | Descricao |
+| --- | --- |
+| `npm start` | Inicia a API com Node.js. |
+| `npm run dev` | Inicia a API com `node --watch`. |
+| `npm run ingest` | Processa os documentos e gera embeddings. |
+| `npm test` | Executa uma checagem de sintaxe do servidor. |
+
+## Base de Conhecimento
+
+Os documentos ficam em `src/data` e cobrem temas como:
+
+- anuncios;
+- cancelamentos;
+- devolucao;
+- entrega;
+- frete gratis;
+- Mercado Pago;
+- pagamentos;
+- reputacao;
+- suporte;
+- vendedores.
+
+Para adicionar novos conhecimentos, basta criar ou editar arquivos `.md` nessa pasta e rodar novamente:
+
+```bash
+npm run ingest
+```
+
+## Variaveis de Ambiente
+
+| Variavel | Obrigatoria | Descricao |
+| --- | --- | --- |
+| `OPENROUTER_API_KEY` | Sim | Chave usada para autenticar no OpenRouter. |
+| `OPENROUTER_MODEL` | Nao | Modelo usado na geracao da resposta. Padrao: `deepseek/deepseek-chat`. |
+| `PORT` | Nao | Porta da API. Padrao: `3000`. |
+
+## Objetivo do Projeto
+
+Este projeto foi desenvolvido como estudo pratico de RAG, embeddings e integracao com LLMs. Ele mostra como uma aplicacao pode consultar uma base propria de documentos e responder perguntas com mais contexto, reduzindo respostas genericas e aproximando a IA de um dominio especifico.
+
+## Possiveis Evolucoes
+
+- Retornar apenas o texto final da resposta do modelo.
+- Adicionar validacao de entrada no endpoint `/ask`.
+- Criar uma interface web para conversar com a API.
+- Persistir embeddings em um banco vetorial como Chroma, Qdrant ou Pinecone.
+- Adicionar testes automatizados para a busca semantica e montagem de prompt.
+- Melhorar logs, tratamento de erros e observabilidade.
+
+## Autor
+
+Desenvolvido por [Lucas Metron](https://github.com/lucasmetron).

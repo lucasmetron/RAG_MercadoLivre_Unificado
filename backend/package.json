@@ -1,0 +1,32 @@
+{
+  "name": "rag_mercadolivre",
+  "version": "1.0.0",
+  "description": "Projeto inicial para estudar RAG com politicas do Mercado Livre.",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "node --check src/server.js",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "ingest": "node src/functions/ingest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucasmetron/RAG_MercadoLivre.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucasmetron/RAG_MercadoLivre/issues"
+  },
+  "homepage": "https://github.com/lucasmetron/RAG_MercadoLivre#readme",
+  "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "@langchain/core": "^1.1.45",
+    "@langchain/openai": "^1.4.5",
+    "@langchain/textsplitters": "^1.0.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "openai": "^6.37.0"
+  }
+}
