@@ -25,6 +25,12 @@ A aplicacao permite que o usuario faca perguntas sobre temas relacionados a regr
 
 O objetivo e estudar, de forma pratica, como uma aplicacao RAG funciona de ponta a ponta: documentos, chunks, embeddings, similaridade semantica, prompt com contexto, LLM e interface web.
 
+## Demonstracao
+
+<p align="center">
+  <img alt="Demonstracao da aplicacao RAG Mercado Livre" src="./assets/demo.gif" />
+</p>
+
 ## Destaques
 
 - Projeto full stack rodando com um unico comando via Docker Compose.
