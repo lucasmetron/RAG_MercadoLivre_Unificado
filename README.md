@@ -16,10 +16,10 @@
 
 ## Sobre o projeto
 
-Este repositorio une dois projetos que antes estavam separados:
+Este repositorio une dois projetos Front End e Back End:
 
-- um frontend em React/Vite com uma experiencia de chat estilo IA;
-- um backend em Node.js/Express responsavel por ingestao, busca semantica e chamada ao modelo de linguagem.
+- Frontend em React/Vite com uma experiencia de chat estilo IA;
+- Backend em Node.js/Express responsavel por ingestao, busca semantica e chamada ao modelo de linguagem.
 
 A aplicacao permite que o usuario faca perguntas sobre temas relacionados a regras, atendimento e operacoes inspiradas no Mercado Livre. O backend busca os trechos mais relevantes em documentos Markdown, monta um prompt com contexto recuperado e envia a pergunta para um modelo via OpenRouter.
 
